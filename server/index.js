@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 const pool = require('./db');
 
 const app = express();
@@ -140,5 +142,24 @@ app.get('/api/stats', h(async (req, res) => {
   res.json(r.rows[0]);
 }));
 
+// ---------- Serve the built React app (used when the project is hosted online) ----------
+const dist = path.join(__dirname, '..', 'client', 'dist');
+if (fs.existsSync(dist)) {
+  app.use(express.static(dist));
+  app.get(/^\/(?!api).*/, (req, res) => res.sendFile(path.join(dist, 'index.html')));
+}
+
+// ---------- Create the tables automatically on a brand-new database ----------
+async function initDb() {
+  const r = await pool.query("SELECT to_regclass('public.tasks') AS t");
+  if (!r.rows[0].t) {
+    const sql = fs.readFileSync(path.join(__dirname, '..', 'database', 'schema.sql'), 'utf8');
+    await pool.query(sql);
+    console.log('Database was empty: tables and sample data created from schema.sql');
+  }
+}
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
+initDb()
+  .catch((e) => console.error('Database setup failed:', e.message))
+  .finally(() => app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`)));
