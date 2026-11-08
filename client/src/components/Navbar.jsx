@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import Icon from './Icon.jsx';
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -7,7 +8,10 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-inner">
-        <span className="brand">TaskFlow</span>
+        <span className="brand">
+          <span className="brand-mark"><Icon name="check" size={16} /></span>
+          TaskFlow
+        </span>
         <button className="menu-btn" aria-label="Toggle menu" aria-expanded={open} onClick={() => setOpen(!open)}>
           Menu
         </button>

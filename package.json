@@ -1,0 +1,10 @@
+{
+  "name": "taskflow",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npm --prefix server install && npm --prefix client install --legacy-peer-deps && npm --prefix client run build",
+    "start": "node server/index.js"
+  },
+  "engines": { "node": ">=18" }
+}
